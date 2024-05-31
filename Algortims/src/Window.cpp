@@ -126,20 +126,21 @@ void Window::KeyEvents()
 
 	if (keyboard.KeyIsPressed('W'))
 	{
-		this->gfx->camera.AdjustPosition(this->gfx->camera.DEFAULT_FORWARD_VECTOR * cameraSpeed);
+		this->gfx->camera.AdjustPosition(this->gfx->camera.GetForwardVector() * cameraSpeed);
 	}
 	if (keyboard.KeyIsPressed('S'))
 	{
-		this->gfx->camera.AdjustPosition(this->gfx->camera.DEFAULT_BACKWARD_VECTOR * cameraSpeed);
+		this->gfx->camera.AdjustPosition(this->gfx->camera.GetBackwardVector() * cameraSpeed);
 	}
 	if (keyboard.KeyIsPressed('A'))
 	{
-		this->gfx->camera.AdjustPosition(this->gfx->camera.DEFAULT_LEFT_VECTOR * cameraSpeed);
+		this->gfx->camera.AdjustPosition(this->gfx->camera.GetLeftVector() * cameraSpeed);
 	}
 	if (keyboard.KeyIsPressed('D'))
 	{
-		this->gfx->camera.AdjustPosition(this->gfx->camera.DEFAULT_RIGHT_VECTOR * cameraSpeed);
+		this->gfx->camera.AdjustPosition(this->gfx->camera.GetRightVector() * cameraSpeed);
 	}
+
 }
 
 void Window::DoFrame()
