@@ -94,7 +94,7 @@ Graphics::Graphics(HWND hwnd)
 	pContext->RSSetViewports(1u, &vt);
 
 	camera.SetPosition(0.0f, 0.0f, -2.0f);
-	camera.SetProjectionValues(90.f, static_cast<float>(800) / static_cast<float>(600), 0.1f, 1000.f);
+	camera.SetProjection(90.f, static_cast<float>(800) / static_cast<float>(600), 0.1f, 1000.f);
 }
 
 Graphics::~Graphics()

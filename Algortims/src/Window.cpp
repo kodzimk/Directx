@@ -122,7 +122,7 @@ void Window::KeyEvents()
 		}
 	}
 
-	const float cameraSpeed = 0.02f;
+	const float cameraSpeed = 0.05f;
 
 	if (keyboard.KeyIsPressed('W'))
 	{
@@ -130,7 +130,7 @@ void Window::KeyEvents()
 	}
 	if (keyboard.KeyIsPressed('S'))
 	{
-		this->gfx->camera.AdjustPosition(this->gfx->camera.GetBackwardVector() * cameraSpeed);
+		this->gfx->camera.AdjustPosition(this->gfx->camera.GetBackWardVector() * cameraSpeed);
 	}
 	if (keyboard.KeyIsPressed('A'))
 	{
