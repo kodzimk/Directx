@@ -73,16 +73,14 @@ Graphics::Graphics(HWND hwnd)
 	pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDepthView.Get());
 
 	D3D11_DEPTH_STENCIL_DESC dt = {};
-	dt.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	dt.DepthFunc =D3D11_COMPARISON_LESS;
 	dt.DepthEnable = true;
 	dt.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 
 		pDevice->CreateDepthStencilState(&dt,depthState.GetAddressOf());
 
 
-	player = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso",0.7f,1.0f);
-	player2 = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso", 1.0f, 1.0f);
-	player3 = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso", 0.6f, 0.4f);
+	player = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso",0.3f,0.1f);
 
 	pSpriteBatch = std::make_unique <DirectX::SpriteBatch>(this->pContext.Get());
 	pSpriteFont = std::make_unique<DirectX::SpriteFont>(this->pDevice.Get(), L"res\\comic_sans_ms_16.spritefont");
@@ -124,6 +122,19 @@ Graphics::Graphics(HWND hwnd)
 
 	pDevice->CreateBlendState(&bd, blendState.GetAddressOf());
 
+
+	D3D11_RASTERIZER_DESC rd = {};
+	rd.FillMode = D3D11_FILL_SOLID;
+	rd.CullMode = D3D11_CULL_BACK;
+
+	pDevice->CreateRasterizerState(&rd, rasterizeState.GetAddressOf());
+	
+
+	D3D11_RASTERIZER_DESC crd = {};
+	crd.FillMode = D3D11_FILL_SOLID;
+	crd.CullMode = D3D11_CULL_NONE;
+
+	pDevice->CreateRasterizerState(&crd, rasterizeState_CullFront.GetAddressOf());
 }
 
 Graphics::~Graphics()
@@ -141,27 +152,30 @@ void Graphics::DrawSomething()
 	XMMATRIX worldMatrix = XMMatrixIdentity();
 
 	matrix = worldMatrix * camera.GetViewMatrix() * camera.GetProjectionMatrix();
-	matrix = XMMatrixTranspose(matrix);
 
-	D3D11_BUFFER_DESC cbd = {};
-	cbd.ByteWidth = sizeof(matrix);
-	cbd.Usage = D3D11_USAGE_DYNAMIC;
-	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cbd.MiscFlags = 0u;
-	cbd.StructureByteStride = 0u;
+	//D3D11_BUFFER_DESC cbd = {};
+	//cbd.ByteWidth = sizeof(matrix);
+	//cbd.Usage = D3D11_USAGE_DYNAMIC;
+	//cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	//cbd.MiscFlags = 0u;
+	//cbd.StructureByteStride = 0u;
 
-	D3D11_SUBRESOURCE_DATA csd = {};
-	csd.pSysMem = &matrix;
+	//D3D11_SUBRESOURCE_DATA csd = {};
+	//csd.pSysMem = &matrix;
 
-	pDevice->CreateBuffer(&cbd, &csd, &pConstBuffer);
-	pContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
+	//pDevice->CreateBuffer(&cbd, &csd, &pConstBuffer);
+	/*pContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());*/
+
 
 	pContext->OMSetBlendState(blendState.Get(), NULL, 0xFFFFFFFF);
-	player->Bind(pContext.Get(), pDevice.Get(), L"res\\pinksquare.jpg", depthState.Get());
-	player->Update();
-	player->Draw(pContext.Get(), pDevice.Get());
+	pContext->OMSetDepthStencilState(depthState.Get(), 0);
 
+	player->SetPosition(2.0f, 0.0f, 0.0f);
+	player->Bind(pContext.Get(), pDevice.Get(), L"res\\pinksquare.jpg",matrix);
+	pContext->RSSetState(rasterizeState_CullFront.Get());
+	player->Draw(pContext.Get(), pDevice.Get());
+	pContext->RSSetState(rasterizeState.Get());
 
 
 

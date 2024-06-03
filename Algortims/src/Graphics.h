@@ -9,7 +9,6 @@
 #include <iostream>
 #include"Camera.h"
 
-using namespace DirectX;
 
 class Graphics
 {
@@ -29,12 +28,9 @@ public:
 	void DoFrame();
 public:
 	std::unique_ptr<Player> player;
-	std::unique_ptr<Player> player2;
-	std::unique_ptr<Player> player3;
-	XMFLOAT3 position = { 0.0f,0.0f,-2.0f };
 	Camera camera;
 private:
-	dx::XMMATRIX matrix;
+	XMMATRIX matrix;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>pConstBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice = nullptr;
 	Microsoft::WRL::ComPtr <IDXGISwapChain> pSwap = nullptr;
@@ -44,6 +40,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthBuffer;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthState;
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizeState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizeState_CullFront;
 
 	std::unique_ptr<DirectX::SpriteBatch> pSpriteBatch;
 	std::unique_ptr<DirectX::SpriteFont> pSpriteFont;
