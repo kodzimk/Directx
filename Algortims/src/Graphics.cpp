@@ -5,8 +5,13 @@
 #include<string>
 #include<math.h>
 #include<DirectXMath.h>
+#include"Imgui/imgui.h"
+#include"Imgui/imgui_impl_win32.h"
+#include"Imgui/imgui_impl_dx11.h"
 
 namespace dx = DirectX;
+
+
 
 Graphics::Graphics(HWND hwnd)
 {
@@ -75,8 +80,9 @@ Graphics::Graphics(HWND hwnd)
 		pDevice->CreateDepthStencilState(&dt,depthState.GetAddressOf());
 
 
-	player = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso",0.0f);
-
+	player = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso",0.7f,1.0f);
+	player2 = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso", 1.0f, 1.0f);
+	player3 = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso", 0.6f, 0.4f);
 
 	pSpriteBatch = std::make_unique <DirectX::SpriteBatch>(this->pContext.Get());
 	pSpriteFont = std::make_unique<DirectX::SpriteFont>(this->pDevice.Get(), L"res\\comic_sans_ms_16.spritefont");
@@ -95,6 +101,29 @@ Graphics::Graphics(HWND hwnd)
 
 	camera.SetPosition(0.0f, 0.0f, -2.0f);
 	camera.SetProjection(90.f, static_cast<float>(800) / static_cast<float>(600), 0.1f, 1000.f);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get());
+	ImGui::StyleColorsDark();
+
+	D3D11_BLEND_DESC bd = {};
+	D3D11_RENDER_TARGET_BLEND_DESC rtbd = {};
+	rtbd.BlendEnable = true;
+	rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+	rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+	rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
+	rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	bd.RenderTarget[0] = rtbd;
+
+	pDevice->CreateBlendState(&bd, blendState.GetAddressOf());
+
 }
 
 Graphics::~Graphics()
@@ -128,9 +157,12 @@ void Graphics::DrawSomething()
 	pDevice->CreateBuffer(&cbd, &csd, &pConstBuffer);
 	pContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
 
-	player->Bind(pContext.Get(), pDevice.Get(), L"res\\wall.jpg", depthState.Get());
+	pContext->OMSetBlendState(blendState.Get(), NULL, 0xFFFFFFFF);
+	player->Bind(pContext.Get(), pDevice.Get(), L"res\\pinksquare.jpg", depthState.Get());
 	player->Update();
 	player->Draw(pContext.Get(), pDevice.Get());
+
+
 
 
 	pSpriteBatch->Begin();
@@ -138,6 +170,19 @@ void Graphics::DrawSomething()
 		DirectX::XMFLOAT2(0, 0), DirectX::Colors::Black,0.0f,DirectX::XMFLOAT2(0,0),
 		DirectX::XMFLOAT2(1, 1));
 	pSpriteBatch->End();
+
+
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Test");
+	ImGui::Text("Text to test");
+	ImGui::Button("Nigaa");
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 }
 

@@ -30,6 +30,7 @@ public:
 public:
 	std::unique_ptr<Player> player;
 	std::unique_ptr<Player> player2;
+	std::unique_ptr<Player> player3;
 	XMFLOAT3 position = { 0.0f,0.0f,-2.0f };
 	Camera camera;
 private:
@@ -42,6 +43,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthView;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthBuffer;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthState;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
 
 	std::unique_ptr<DirectX::SpriteBatch> pSpriteBatch;
 	std::unique_ptr<DirectX::SpriteFont> pSpriteFont;

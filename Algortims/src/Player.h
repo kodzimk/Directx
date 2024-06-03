@@ -10,7 +10,7 @@ namespace dx = DirectX;
 class Player
 {
 public:
-	Player(ID3D11Device* pDevice,LPCWSTR vertexDir,LPCWSTR pixelDir,float depthZ);
+	Player(ID3D11Device* pDevice,LPCWSTR vertexDir,LPCWSTR pixelDir,float depthZ,float a);
 	Player();
 
 	~Player();
@@ -21,6 +21,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pConstBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> pIndexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> pSampleState;
@@ -41,6 +42,7 @@ private:
 		float z;
 		float r;
 		float g;
+		float a;
 	};	
 	struct MATRIX {
 		dx::XMMATRIX transform;
@@ -60,13 +62,15 @@ public:
 		)
 	};
 
-	 Vertex vertices[6] =  {
-   {-0.5f,-0.5f,1.0f,0.0f,1.0f},
-   {-0.5f,0.0f,1.0f,0.0f,0.0f},
-   {0.5f,0.0f,1.0f,1.0f,0.0f},
-   {0.5f,0.0f,1.0f,1.0f,0.0f},
-   {0.5f,-0.5f,1.0f,1.0f,1.0f},
-   {-0.5f,-0.5f,1.0f,0.0f,1.0f}
+	 Vertex vertices[8] =  {
+        Vertex(-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,1.0f), //FRONT Bottom Left   - [0]
+		Vertex(-0.5f,   0.5f, -0.5f, 0.0f, 0.0f,1.0f), //FRONT Top Left      - [1]
+		Vertex(0.5f,   0.5f, -0.5f, 1.0f, 0.0f,1.0f), //FRONT Top Right     - [2]
+		Vertex(0.5f,  -0.5f, -0.5f, 1.0f, 1.0f,1.0f), //FRONT Bottom Right   - [3]
+		Vertex(-0.5f,  -0.5f, 0.5f, 0.0f, 1.0f,1.0f), //BACK Bottom Left   - [4]
+		Vertex(-0.5f,   0.5f, 0.5f, 0.0f, 0.0f,1.0f), //BACK Top Left      - [5]
+		Vertex(0.5f,   0.5f, 0.5f, 1.0f, 0.0f,1.0f), //BACK Top Right     - [6]
+		Vertex(0.5f,  -0.5f, 0.5f, 1.0f, 1.0f,1.0f), //BACK Bottom Right   - [7]
 	};
 };
 

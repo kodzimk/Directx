@@ -145,7 +145,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\GCamera.cpp" />
+    <ClCompile Include="src\Imgui\imgui.cpp" />
+    <ClCompile Include="src\Imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\Imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\Imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\Imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\Imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\KeyboardEvent.cpp" />
     <ClCompile Include="src\MouseEvent.cpp" />
     <ClCompile Include="src\Camera.cpp" />
@@ -158,8 +163,15 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GCamera.h" />
     <ClInclude Include="src\Gutility.h" />
+    <ClInclude Include="src\Imgui\imconfig.h" />
+    <ClInclude Include="src\Imgui\imgui.h" />
+    <ClInclude Include="src\Imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="src\Imgui\imgui_impl_win32.h" />
+    <ClInclude Include="src\Imgui\imgui_internal.h" />
+    <ClInclude Include="src\Imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\Imgui\imstb_textedit.h" />
+    <ClInclude Include="src\Imgui\imstb_truetype.h" />
     <ClInclude Include="src\KeyboardEvent.h" />
     <ClInclude Include="src\MouseEvent.h" />
     <ClInclude Include="src\Camera.h" />
@@ -183,7 +195,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\code.jpg" />
+    <Image Include="res\pinksquare.jpg" />
     <Image Include="res\Player.png" />
+    <Image Include="res\seamless_grass.jpg" />
     <Image Include="res\wall.jpg" />
   </ItemGroup>
   <ItemGroup>
