@@ -1,15 +1,14 @@
 #pragma once
-#include"Mesh.h"
+#include"Player.h"
+#include<memory>
 
-class Player
+class GameObject
 {
 public:
-	Player(const std::string& filePath,ID3D11Device* pDevice, ID3D11DeviceContext* pContext,LPCWSTR vertexDir,LPCWSTR pixelDir,float depthZ,float a);
-	Player();
-
-	~Player();
-	void Bind(ID3D11DeviceContext* pContext,ID3D11Device* pDevice, const wchar_t* fileName,XMMATRIX matrix);
-	void Draw(ID3D11DeviceContext* pContext, ID3D11Device* pDevice);
+	GameObject(const std::string& filePath, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LPCWSTR vertexDir, LPCWSTR pixelDir, float depthZ, float a);
+	GameObject();
+	void Bind(ID3D11DeviceContext* pContext, ID3D11Device* pDevice, const wchar_t* fileName, XMMATRIX matrix);
+	void Draw(ID3D11Device* pDE, ID3D11DeviceContext* pDevice);
 
 	const XMVECTOR& GetPositionVector() const;
 	const XMFLOAT3& GetPositionFloat3() const;
@@ -34,24 +33,11 @@ public:
 	const XMVECTOR& GetBackwardVector();
 	const XMVECTOR& GetLeftVector();
 
-public:
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> pConstBuffer;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> pSampleState;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTexture;
-	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 
 private:
+	std::unique_ptr<Player> player;
 	void UpdateWorldMatrix();
-	bool LoadModel(const std::string& filePath);
-	void ProcessNode(aiNode* node, const aiScene* scene);
-	Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 public:
-	Vertex vertices[8];
-	std::vector<Mesh> meshes;
 
 	XMMATRIX worldMatrix = XMMatrixIdentity();
 

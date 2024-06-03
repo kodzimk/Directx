@@ -1,12 +1,5 @@
 #pragma once
 #include"Player.h"
-#include<memory>
-#include<SpriteBatch.h>
-#include<SpriteFont.h>
-
-#include <d3d11.h>
-#include <directxmath.h>
-#include <iostream>
 #include"Camera.h"
 
 
@@ -27,7 +20,7 @@ public:
 	void DrawSomething();
 	void DoFrame();
 public:
-	std::unique_ptr<Player> player;
+	std::unique_ptr<Player> object;
 	Camera camera;
 private:
 	XMMATRIX matrix;

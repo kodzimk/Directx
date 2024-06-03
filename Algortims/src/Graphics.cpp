@@ -77,10 +77,9 @@ Graphics::Graphics(HWND hwnd)
 	dt.DepthEnable = true;
 	dt.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 
-		pDevice->CreateDepthStencilState(&dt,depthState.GetAddressOf());
+	pDevice->CreateDepthStencilState(&dt,depthState.GetAddressOf());
 
-
-	player = std::make_unique<Player>(pDevice.Get(), L"VertexShader.cso", L"PixelShader.cso",0.3f,0.1f);
+	object = std::make_unique<Player>("res\\nanosuit.obj",pDevice.Get(),pContext.Get(), L"VertexShader.cso", L"PixelShader.cso", 0.0f, 1.0f);
 
 	pSpriteBatch = std::make_unique <DirectX::SpriteBatch>(this->pContext.Get());
 	pSpriteFont = std::make_unique<DirectX::SpriteFont>(this->pDevice.Get(), L"res\\comic_sans_ms_16.spritefont");
@@ -170,12 +169,10 @@ void Graphics::DrawSomething()
 
 	pContext->OMSetBlendState(blendState.Get(), NULL, 0xFFFFFFFF);
 	pContext->OMSetDepthStencilState(depthState.Get(), 0);
-
-	player->SetPosition(2.0f, 0.0f, 0.0f);
-	player->Bind(pContext.Get(), pDevice.Get(), L"res\\pinksquare.jpg",matrix);
-	pContext->RSSetState(rasterizeState_CullFront.Get());
-	player->Draw(pContext.Get(), pDevice.Get());
 	pContext->RSSetState(rasterizeState.Get());
+
+	object->Bind(pContext.Get(), pDevice.Get(), L"res\\pinksquare.jpg",matrix);
+	object->Draw(pContext.Get(), pDevice.Get());
 
 
 

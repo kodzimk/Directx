@@ -120,7 +120,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;dSINGLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -149,6 +149,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\GameObject.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Imgui\imgui.cpp" />
     <ClCompile Include="src\Imgui\imgui_draw.cpp" />
     <ClCompile Include="src\Imgui\imgui_impl_dx11.cpp" />
@@ -167,6 +169,8 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GameObject.h" />
+    <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Gutility.h" />
     <ClInclude Include="src\Imgui\imconfig.h" />
     <ClInclude Include="src\Imgui\imgui.h" />

@@ -4,61 +4,14 @@
 #include<sstream>
 
 
-Player::Player(ID3D11Device* pDevice, LPCWSTR vertexDir, LPCWSTR pixelDir, float depthZ, float a)
+Player::Player(const std::string& filePath, ID3D11Device* pDevice,ID3D11DeviceContext* pContext, LPCWSTR vertexDir, LPCWSTR pixelDir, float depthZ, float a)
 {
-	vertices[0] = { -0.5f, -0.5f, -depthZ, 0.0f, 1.0f, a }; //FRONT Bottom Left   - [0]
-	vertices[1] = { -0.5f, 0.5f, -depthZ, 0.0f, 0.0f, a }; //FRONT Top Left      - [1]
-	vertices[2] = { 0.5f, 0.5f, -depthZ, 1.0f, 0.0f, a }; //FRONT Top Right     - [2]
-	vertices[3] = { 0.5f, -0.5f, -depthZ, 1.0f, 1.0f, a }; //FRONT Bottom Right   - [3]
-	vertices[4] = { -0.5f, -0.5f, depthZ, 0.0f, 1.0f, a }; //BACK Bottom Left   - [4]
-	vertices[5] = { -0.5f, 0.5f,depthZ, 0.0f, 0.0f, a }; //BACK Top Left      - [5]
-	vertices[6] = { 0.5f, 0.5f,depthZ, 1.0f, 0.0f, a }; //BACK Top Right     - [6]
-	vertices[7] = { 0.5f, -0.5f, depthZ, 1.0f, 1.0f, a }; //BACK Bottom Right   - [7]
 
-	DWORD indices[] =
-	{
-		0, 1, 2, //FRONT
-		0, 2, 3, //FRONT
-		4, 7, 6, //BACK 
-		4, 6, 5, //BACK
-		3, 2, 6, //RIGHT SIDE
-		3, 6, 7, //RIGHT SIDE
-		4, 5, 1, //LEFT SIDE
-		4, 1, 0, //LEFT SIDE
-		1, 5, 6, //TOP
-		1, 6, 2, //TOP
-		0, 3, 7, //BOTTOM
-		0, 7, 4, //BOTTOM
-	};
+	this->pDevice = pDevice;
+	this->pContext = pContext;
 
-
-	size = (UINT)std::size(indices);
-
-	D3D11_BUFFER_DESC bd = {};
-	bd.ByteWidth = sizeof(vertices);
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0u;
-	bd.MiscFlags = 0u;
-	bd.StructureByteStride = sizeof(Vertex);
-	
-	D3D11_SUBRESOURCE_DATA sd = {};
-	sd.pSysMem = vertices;
-
-	pDevice->CreateBuffer(&bd, &sd, &pVertexBuffer);
-
-	D3D11_BUFFER_DESC ibd = {};
-	ibd.ByteWidth = sizeof(indices);
-	ibd.Usage = D3D11_USAGE_DEFAULT;
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = 0u;
-	ibd.MiscFlags = 0u;
-	ibd.StructureByteStride = sizeof(DWORD);
-
-	D3D11_SUBRESOURCE_DATA isd = {};
-	isd.pSysMem = indices;
-
-	pDevice->CreateBuffer(&ibd, &isd, &pIndexBuffer);
+	if (!LoadModel(filePath))
+		throw "ngaa";
 
 
 	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
@@ -120,7 +73,7 @@ void Player::Bind(ID3D11DeviceContext* pContext,ID3D11Device* pDevice, const wch
 	if (FAILED(hr))
 		throw " sas";
 
-	worldMatrix =worldMatrix * matrix;
+	worldMatrix = matrix;
 	worldMatrix = XMMatrixTranspose(worldMatrix);
 
 	D3D11_BUFFER_DESC Cbd = {};
@@ -136,8 +89,6 @@ void Player::Bind(ID3D11DeviceContext* pContext,ID3D11Device* pDevice, const wch
 
 	pDevice->CreateBuffer(&Cbd, &csd, pConstBuffer.GetAddressOf());
 
-	pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 	pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
 	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
 	pContext->PSSetSamplers(0u, 1u, pSampleState.GetAddressOf());
@@ -147,9 +98,10 @@ void Player::Bind(ID3D11DeviceContext* pContext,ID3D11Device* pDevice, const wch
 void Player::Draw(ID3D11DeviceContext* pContext, ID3D11Device* pDevice)
 {
 	pContext->VSSetConstantBuffers(0, 1, pConstBuffer.GetAddressOf());
-	pContext->PSSetShaderResources(0u, 1u, pTexture.GetAddressOf());
-	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	pContext->DrawIndexed(size,0u, 0u);
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		meshes[i].Draw();
+	}
 }
 
 void Player::UpdateWorldMatrix()
@@ -160,6 +112,71 @@ void Player::UpdateWorldMatrix()
 	this->vec_backward = XMVector3TransformCoord(this->DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
 	this->vec_left = XMVector3TransformCoord(this->DEFAULT_LEFT_VECTOR, vecRotationMatrix);
 	this->vec_right = XMVector3TransformCoord(this->DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
+}
+
+bool Player::LoadModel(const std::string& filePath)
+{
+	Assimp::Importer importer;
+
+	const aiScene* pScene = importer.ReadFile(filePath,
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded);
+
+	if (pScene == nullptr)
+		return false;
+
+	this->ProcessNode(pScene->mRootNode, pScene);
+	return true;
+}
+
+void Player::ProcessNode(aiNode* node, const aiScene* scene)
+{
+	for (UINT i = 0; i < node->mNumMeshes; i++)
+	{
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		meshes.push_back(this->ProcessMesh(mesh, scene));
+	}
+
+	for (UINT i = 0; i < node->mNumChildren; i++)
+	{
+		this->ProcessNode(node->mChildren[i], scene);
+	}
+}
+
+Mesh Player::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+{
+	// Data to fill
+	std::vector<Vertex> vertices;
+	std::vector<DWORD> indices;
+
+	//Get vertices
+	for (UINT i = 0; i < mesh->mNumVertices; i++)
+	{
+		Vertex vertex;
+
+		vertex.x = mesh->mVertices[i].x;
+		vertex.y = mesh->mVertices[i].y;
+		vertex.z = mesh->mVertices[i].z;
+
+		if (mesh->mTextureCoords[0])
+		{
+			vertex.r = (float)mesh->mTextureCoords[0][i].x;
+			vertex.g = (float)mesh->mTextureCoords[0][i].y;
+		}
+
+		vertices.push_back(vertex);
+	}
+
+	//Get indices
+	for (UINT i = 0; i < mesh->mNumFaces; i++)
+	{
+		aiFace face = mesh->mFaces[i];
+
+		for (UINT j = 0; j < face.mNumIndices; j++)
+			indices.push_back(face.mIndices[j]);
+	}
+
+	return Mesh(this->pDevice.Get(), this->pContext.Get(), vertices, indices);
 }
 
 const XMVECTOR& Player::GetPositionVector() const

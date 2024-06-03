@@ -1,5 +1,4 @@
 #include "Window.h"
-#include<sstream>
 
 Window::Window(int width, int height,HINSTANCE hInstance)
 	:
@@ -121,8 +120,6 @@ void Window::KeyEvents()
 			}
 		}
 	}
-
-	gfx->player->AdjustRotation(0.0f, 0.01f, 0.0f);
 
 	const float cameraSpeed = 0.05f;
 
